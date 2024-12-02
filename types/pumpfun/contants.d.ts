@@ -1,0 +1,11 @@
+import { PublicKey } from "@solana/web3.js";
+export declare const GLOBAL: PublicKey;
+export declare const FEE_RECIPIENT: PublicKey;
+export declare const TOKEN_PROGRAM_ID: PublicKey;
+export declare const ASSOCIATED_TOKEN_PROGRAM_ID: PublicKey;
+export declare const ASSOC_TOKEN_ACC_PROG: PublicKey;
+export declare const RENT: PublicKey;
+export declare const PUMP_FUN_PROGRAM: PublicKey;
+export declare const PUMP_FUN_ACCOUNT: PublicKey;
+export declare const SYSTEM_PROGRAM_ID: PublicKey;
+export declare const PUMP_FUN_TOKEN_DECIMALS = 6;
