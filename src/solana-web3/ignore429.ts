@@ -144,16 +144,37 @@ export async function getMultipleParsedAccounts(
   }
 }
 
+export async function getMultipleRawAccountsInfo(
+  connection: Connection,
+  publicKeys: PublicKey[],
+  rawConfig?: GetMultipleAccountsConfig
+): Promise<(AccountInfo<Buffer> | null)[]> {
+  while (true) {
+    try {
+      const result = await connection.getMultipleAccountsInfo(
+        publicKeys,
+        rawConfig
+      );
+      return result;
+    } catch (err) {
+      if (!isIgnoreErr(err)) {
+        throw err;
+      }
+    }
+    await TimeUtil.sleep(1000);
+  }
+}
+
 // 获取 PDA 账户的数据信息
 export async function getAssociatedAccountInfo(
   connection: Connection,
   address: PublicKey
 ): Promise<Account> {
-  const info = await getAccountInfo(connection, address, "confirmed");
+  const info = await getRawAccountInfo(connection, address, "confirmed");
   return unpackAccount(address, info, TOKEN_PROGRAM_ID);
 }
 
-export async function getAccountInfo(
+export async function getRawAccountInfo(
   connection: Connection,
   publicKey: PublicKey,
   commitmentOrConfig?: Commitment | GetAccountInfoConfig

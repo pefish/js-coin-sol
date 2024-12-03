@@ -27,8 +27,8 @@ import {
 import { Order, RouterNames, SOL_DECIMALS } from "../constants";
 import { getSwapInstructionsFromJup } from "../jupiter";
 import {
-  getAccountInfo,
   getAssociatedAccountInfo,
+  getRawAccountInfo,
 } from "../solana-web3/ignore429";
 import { findInnerInstructions, getAllFeeOfTx } from "../util";
 import {
@@ -53,7 +53,7 @@ export async function parseBondingCurveAddressData(
   tokenTotalSupply: string;
   complete: boolean;
 }> {
-  const parsedAccount = await getAccountInfo(
+  const parsedAccount = await getRawAccountInfo(
     connection,
     new PublicKey(bondingCurveAddress)
   );

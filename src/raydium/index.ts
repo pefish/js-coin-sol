@@ -739,3 +739,32 @@ export async function parseRaydiumSwapTx(
     },
   };
 }
+
+export async function getTokenPrice(
+  connection: Connection,
+  solVaultAddress: string,
+  tokenVaultAddress: string
+): Promise<string> {
+  const parsedAccounts = await getMultipleParsedAccounts(connection, [
+    new PublicKey(solVaultAddress),
+    new PublicKey(tokenVaultAddress),
+  ]);
+
+  if (!parsedAccounts[0]) {
+    throw new Error(`SOL vault address <${solVaultAddress}> not found.`);
+  }
+
+  if (!parsedAccounts[1]) {
+    throw new Error(`Token vault address <${tokenVaultAddress}> not found.`);
+  }
+
+  const solAmount = (parsedAccounts[0].data as ParsedAccountData).parsed[
+    "info"
+  ]["tokenAmount"]["uiAmount"];
+
+  const tokenAmount = (parsedAccounts[1].data as ParsedAccountData).parsed[
+    "info"
+  ]["tokenAmount"]["uiAmount"];
+
+  return StringUtil.start(solAmount).div(tokenAmount).toString();
+}

@@ -46,9 +46,9 @@ import { parseOrderTransaction } from "./parse_order";
 import { getPumpFunSwapInstructions } from "./pumpfun";
 import { getRaydiumSwapInstructions, RaydiumSwapKeys } from "./raydium";
 import {
-  getAccountInfo,
   getLatestBlockhash,
   getParsedTransaction,
+  getRawAccountInfo,
   getRecentPrioritizationFees,
   getSignaturesForAddress,
   isIgnoreErr,
@@ -150,7 +150,7 @@ export async function getTokenMetadata(
   programmableConfig: any | null;
 }> {
   const metadataAccount = getMetadataAccount(connection, tokenAddress);
-  const metadataAccountInfo = await getAccountInfo(
+  const metadataAccountInfo = await getRawAccountInfo(
     connection,
     new PublicKey(metadataAccount)
   );

@@ -5,6 +5,7 @@ import {
   getPoolInfoByLPAddress,
   getPoolInfoByTokenAddress,
   getRaydiumSwapInstructions,
+  getTokenPrice,
   parseRaydiumAddLPTx,
   parseRaydiumSwapTx,
 } from ".";
@@ -91,5 +92,18 @@ describe("util", () => {
     );
     const result = await parseRaydiumSwapTx(conn, tx);
     console.log(result);
+  });
+
+  it("getTokenPrice", async () => {
+    return;
+    const conn = new Connection("https://api.mainnet-beta.solana.com", {
+      commitment: "confirmed",
+    });
+    const price = await getTokenPrice(
+      conn,
+      "NHHESTHTrCgnosAcKPvzBcBGe1YPYYqPEMcxjwLCchX",
+      "2aTcCxnnkhAs2UkbCygNXipMFgymQewcbWarNEhChe1Q"
+    );
+    console.log(price);
   });
 });
