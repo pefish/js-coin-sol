@@ -36,9 +36,22 @@ export declare function getRedditToken(clientId: string, clientSecret: string): 
 }>;
 export declare function getRedditScore(keyword: string, token: string): Promise<number>;
 export declare function estimateComputeUnitPriceByHelius(heliusUrl: string, writableAccounts: string[]): Promise<number>;
-export declare function placeOrder(logger: ILogger, connection: Connection, priv: string, type: OrderType, amount: string, tokenAddress: string, routerType: RouterType, nodeUrls: string[], slippage?: number, raydiumPoolInfo?: RaydiumSwapKeys | null, isCloseTokenAccount?: boolean): Promise<{
+export declare function placeOrder(logger: ILogger, connection: Connection, priv: string, type: OrderType, amount: string, tokenAddress: string, routerType: RouterType, opts: {
+    nodeUrls?: string[];
+    slippage?: number;
+    raydiumSwapKeys?: RaydiumSwapKeys;
+    isCloseTokenAccount?: boolean;
+    computeUnitLimit?: number;
+    accelerationLevel?: number;
+}): Promise<{
     order: Order;
     extraData: RaydiumSwapKeys | null;
 }>;
 export declare function getDepositWSOLInstructions(connection: Connection, fromAddress: string, toAddress: string, amount: string): Promise<TransactionInstruction[]>;
 export declare function estimateComputeUnitPrice(connection: Connection, writableAccounts: string[]): Promise<number>;
+export interface TransactionFeeInfo {
+    baseFee: string;
+    priorityFee: string;
+    totalFee: string;
+}
+export declare function getAllFeeOfTx(transaction: ParsedTransactionWithMeta): TransactionFeeInfo;

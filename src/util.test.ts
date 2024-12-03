@@ -54,16 +54,18 @@ describe("util", () => {
       "0.0001",
       "GvvGuUFnKtsBswuQqeXhTDKB1KXLNHVw522idugTpump",
       "Raydium",
-      ["https://api.mainnet-beta.solana.com"],
-      200,
       {
-        ammAddress: "BZePuemCXpAuimM2ahCTYep6cxAaKihQEb8CjJeRSUqY",
-        poolCoinTokenAccountAddress:
-          "9kKWxwdyuooNYFsEeygdL5LsDuy7WrfBBms7rqazirqG",
-        poolPcTokenAccountAddress:
-          "6Kww3cBGTpctuye8TJk44ksppRhCvpkqfvKHk9BxWxmi",
-        coinMintAddress: "So11111111111111111111111111111111111111112",
-        pcMintAddress: "GvvGuUFnKtsBswuQqeXhTDKB1KXLNHVw522idugTpump",
+        nodeUrls: ["https://api.mainnet-beta.solana.com"],
+        slippage: 200,
+        raydiumSwapKeys: {
+          ammAddress: "BZePuemCXpAuimM2ahCTYep6cxAaKihQEb8CjJeRSUqY",
+          poolCoinTokenAccountAddress:
+            "9kKWxwdyuooNYFsEeygdL5LsDuy7WrfBBms7rqazirqG",
+          poolPcTokenAccountAddress:
+            "6Kww3cBGTpctuye8TJk44ksppRhCvpkqfvKHk9BxWxmi",
+          coinMintAddress: "So11111111111111111111111111111111111111112",
+          pcMintAddress: "GvvGuUFnKtsBswuQqeXhTDKB1KXLNHVw522idugTpump",
+        },
       }
     );
     console.log(result);
@@ -82,9 +84,10 @@ describe("util", () => {
       "0.0001",
       "8xbg3t7kWRxMHGtXZA3De88aScL2zEYoxzfGKicipump",
       "PumpFun",
-      ["https://api.mainnet-beta.solana.com"],
-      200,
-      null
+      {
+        nodeUrls: ["https://api.mainnet-beta.solana.com"],
+        slippage: 200,
+      }
     );
     console.log(result);
   });
@@ -102,10 +105,11 @@ describe("util", () => {
       "3282.642648",
       "8xbg3t7kWRxMHGtXZA3De88aScL2zEYoxzfGKicipump",
       "PumpFun",
-      ["https://api.mainnet-beta.solana.com"],
-      200,
-      null,
-      true
+      {
+        nodeUrls: ["https://api.mainnet-beta.solana.com"],
+        slippage: 200,
+        isCloseTokenAccount: true,
+      }
     );
     console.log(result);
   });
@@ -123,18 +127,20 @@ describe("util", () => {
       "3117.198955",
       "GvvGuUFnKtsBswuQqeXhTDKB1KXLNHVw522idugTpump",
       "Raydium",
-      ["https://api.mainnet-beta.solana.com"],
-      200,
       {
-        ammAddress: "BZePuemCXpAuimM2ahCTYep6cxAaKihQEb8CjJeRSUqY",
-        poolCoinTokenAccountAddress:
-          "9kKWxwdyuooNYFsEeygdL5LsDuy7WrfBBms7rqazirqG",
-        poolPcTokenAccountAddress:
-          "6Kww3cBGTpctuye8TJk44ksppRhCvpkqfvKHk9BxWxmi",
-        coinMintAddress: "So11111111111111111111111111111111111111112",
-        pcMintAddress: "GvvGuUFnKtsBswuQqeXhTDKB1KXLNHVw522idugTpump",
-      },
-      true
+        nodeUrls: ["https://api.mainnet-beta.solana.com"],
+        slippage: 200,
+        raydiumSwapKeys: {
+          ammAddress: "BZePuemCXpAuimM2ahCTYep6cxAaKihQEb8CjJeRSUqY",
+          poolCoinTokenAccountAddress:
+            "9kKWxwdyuooNYFsEeygdL5LsDuy7WrfBBms7rqazirqG",
+          poolPcTokenAccountAddress:
+            "6Kww3cBGTpctuye8TJk44ksppRhCvpkqfvKHk9BxWxmi",
+          coinMintAddress: "So11111111111111111111111111111111111111112",
+          pcMintAddress: "GvvGuUFnKtsBswuQqeXhTDKB1KXLNHVw522idugTpump",
+        },
+        isCloseTokenAccount: true,
+      }
     );
     console.log(result);
   });

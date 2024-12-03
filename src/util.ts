@@ -274,11 +274,14 @@ export async function placeOrder(
   amount: string,
   tokenAddress: string,
   routerType: RouterType,
-  nodeUrls: string[],
-  slippage: number = 50,
-  raydiumPoolInfo: RaydiumSwapKeys | null = null,
-  isCloseTokenAccount: boolean = false,
-  computeUnitLimit: number = 0
+  opts: {
+    nodeUrls?: string[];
+    slippage?: number;
+    raydiumSwapKeys?: RaydiumSwapKeys;
+    isCloseTokenAccount?: boolean;
+    computeUnitLimit?: number;
+    accelerationLevel?: number;
+  }
 ): Promise<{
   order: Order;
   extraData: RaydiumSwapKeys | null;
@@ -294,20 +297,20 @@ export async function placeOrder(
         type,
         tokenAddress,
         amount,
-        slippage,
-        isCloseTokenAccount
+        opts.slippage || 1000,
+        !!opts.isCloseTokenAccount
       );
       break;
     case "Raydium":
-      if (!raydiumPoolInfo) {
+      if (!opts.raydiumSwapKeys) {
         instructions = await getSwapInstructionsFromJup(
           connection,
           wallet.publicKey.toString(),
           type,
           tokenAddress,
           amount,
-          slippage,
-          isCloseTokenAccount
+          opts.slippage || 1000,
+          !!opts.isCloseTokenAccount
         );
         break;
       }
@@ -317,9 +320,9 @@ export async function placeOrder(
         type,
         tokenAddress,
         amount,
-        slippage,
-        raydiumPoolInfo,
-        isCloseTokenAccount
+        opts.slippage || 500,
+        opts.raydiumSwapKeys,
+        !!opts.isCloseTokenAccount
       );
       break;
     default:
@@ -329,8 +332,8 @@ export async function placeOrder(
         type,
         tokenAddress,
         amount,
-        slippage,
-        isCloseTokenAccount
+        opts.slippage || 1000,
+        !!opts.isCloseTokenAccount
       );
       break;
   }
@@ -353,16 +356,21 @@ export async function placeOrder(
     ],
   }).compileToV0Message();
 
-  const computeUnitPrice = await estimateComputeUnitPrice(
+  let computeUnitPrice = await estimateComputeUnitPrice(
     connection,
     messageV0.staticAccountKeys.map((acc: PublicKey): string => {
       return acc.toString();
     })
   );
-  logger.debug(`computeUnitPrice: ${computeUnitPrice}`);
   // 价格超过 300 lamports 就不要下单
   if (computeUnitPrice > 300000000) {
     throw new Error(`Compute unit price <${computeUnitPrice}> too high.`);
+  }
+  if (opts.accelerationLevel) {
+    computeUnitPrice = StringUtil.start(computeUnitPrice)
+      .multi(opts.accelerationLevel)
+      .remainDecimal(0)
+      .toNumber();
   }
   // 组装交易
   const latestBlockhashInfo = await getLatestBlockhash(connection);
@@ -371,7 +379,7 @@ export async function placeOrder(
     recentBlockhash: latestBlockhashInfo.blockhash,
     instructions: [
       ComputeBudgetProgram.setComputeUnitLimit({
-        units: computeUnitLimit || RouterTradeCULimits[routerType][type],
+        units: opts.computeUnitLimit || RouterTradeCULimits[routerType][type],
       }),
       ComputeBudgetProgram.setComputeUnitPrice({
         microLamports: computeUnitPrice,
@@ -383,11 +391,17 @@ export async function placeOrder(
   const transaction = new VersionedTransaction(messageV0);
   transaction.sign([wallet.payer]);
   const rawTransaction = transaction.serialize();
-  const txId = await sendRawTransactionByMultiNode(
-    logger,
-    nodeUrls,
-    rawTransaction
-  );
+  let txId;
+  if (opts.nodeUrls) {
+    txId = await sendRawTransactionByMultiNode(
+      logger,
+      opts.nodeUrls,
+      rawTransaction
+    );
+  } else {
+    txId = await sendRawTransaction(connection, rawTransaction);
+  }
+
   logger.info(`<${txId}> 广播成功`);
   await TimeUtil.sleep(3000);
   const parsedTransaction = await TimeUtil.timeout<ParsedTransactionWithMeta>(
