@@ -277,7 +277,7 @@ export async function placeOrder(
   opts: {
     nodeUrls?: string[];
     slippage?: number;
-    raydiumSwapKeys?: RaydiumSwapKeys;
+    raydiumSwapKeys?: RaydiumSwapKeys | null;
     isCloseTokenAccount?: boolean;
     computeUnitLimit?: number;
     accelerationLevel?: number;
