@@ -31,6 +31,9 @@ import { findInnerInstructions, getAllFeeOfTx } from "./util";
 async function parseTx_BSfD(
   transaction: ParsedTransactionWithMeta
 ): Promise<Order | null> {
+  if (!transaction.blockTime) {
+    return null;
+  }
   // 找到调用 swap 的指令
   let swapInstru: PartiallyDecodedInstruction | null = null;
   let swapInstruIndex: number = 0;
@@ -113,6 +116,7 @@ async function parseTx_BSfD(
       .toString(),
     token_address: pumpfunSwapEventParsedData.mint.toString(),
     fee: feeInfo.totalFee,
+    timestamp: transaction.blockTime * 1000,
   };
 }
 

@@ -57,6 +57,7 @@ export interface Order {
   fee: string;
   token_address: string;
   user: string;
+  timestamp: number;
 }
 
 export const RouterNames: { [x: string]: RouterType } = {

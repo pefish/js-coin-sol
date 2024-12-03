@@ -175,6 +175,9 @@ export async function getSwapInstructionsFromJup(
 export async function parseJupiterSwapTx(
   transaction: ParsedTransactionWithMeta
 ): Promise<Order | null> {
+  if (!transaction.blockTime) {
+    return null;
+  }
   // 找到调用 swap 的指令
   let swapInstru: PartiallyDecodedInstruction | null = null;
   let swapInstruIndex: number = 0;
@@ -269,5 +272,6 @@ export async function parseJupiterSwapTx(
     token_amount: tokenAmount,
     token_address: tokenAddress,
     fee: feeInfo.totalFee,
+    timestamp: transaction.blockTime * 1000,
   };
 }

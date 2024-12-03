@@ -264,6 +264,9 @@ export async function getPumpFunSwapInstructions(
 export async function parsePumpFunSwapTx(
   transaction: ParsedTransactionWithMeta
 ): Promise<Order | null> {
+  if (!transaction.blockTime) {
+    return null;
+  }
   // 找到调用 swap 的指令
   let swapInstru: PartiallyDecodedInstruction | null = null;
   let swapInstruIndex: number = 0;
@@ -327,6 +330,7 @@ export async function parsePumpFunSwapTx(
       .toString(),
     token_address: pumpfunSwapEventParsedData.mint.toString(),
     fee: feeInfo.totalFee,
+    timestamp: transaction.blockTime * 1000,
   };
 }
 

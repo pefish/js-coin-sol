@@ -638,6 +638,9 @@ export async function parseRaydiumSwapTx(
   orderInfo: Order;
   raydiumSwapKeys: RaydiumSwapKeys;
 } | null> {
+  if (!transaction.blockTime) {
+    return null;
+  }
   // 找到调用 swap 的指令
   let swapInstru: PartiallyDecodedInstruction | null = null;
   let swapInstruIndex: number = 0;
@@ -719,6 +722,7 @@ export async function parseRaydiumSwapTx(
       token_amount: tokenAmount,
       token_address: tokenAddress,
       fee: feeInfo.totalFee,
+      timestamp: transaction.blockTime * 1000,
     },
     raydiumSwapKeys: {
       ammAddress: swapInstru.accounts[1].toString(),

@@ -17,6 +17,9 @@ export async function parseMeteoraSwapTx(
   connection: Connection,
   transaction: ParsedTransactionWithMeta
 ): Promise<Order | null> {
+  if (!transaction.blockTime) {
+    return null;
+  }
   // 找到调用 swap 的指令
   let swapInstru: PartiallyDecodedInstruction | null = null;
   let swapInstruIndex: number = 0;
@@ -81,7 +84,6 @@ export async function parseMeteoraSwapTx(
     return null;
   }
 
-  let tokenPoolAddress: string;
   let orderType: OrderType;
   let solAmount: string;
   let tokenAmountWithDecimals: string;
@@ -128,5 +130,6 @@ export async function parseMeteoraSwapTx(
       .toString(),
     token_address: tokenAddress,
     fee: feeInfo.totalFee,
+    timestamp: transaction.blockTime * 1000,
   };
 }
