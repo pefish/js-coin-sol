@@ -75,22 +75,22 @@ export const RouterTradeCULimits: {
 } = {
   Orca: {
     buy: 80000,
-    sell: 40000,
+    sell: 80000,
   },
   PumpFun: {
-    buy: 70000,
-    sell: 40000,
+    buy: 80000,
+    sell: 80000,
   },
   Raydium: {
     buy: 80000,
-    sell: 40000,
+    sell: 80000,
   },
   Meteora: {
     buy: 80000,
-    sell: 40000,
+    sell: 80000,
   },
   Unknown: {
     buy: 80000,
-    sell: 40000,
+    sell: 80000,
   },
 };

@@ -12,7 +12,7 @@ describe("util", () => {
       new Connection("https://api.mainnet-beta.solana.com", {
         commitment: "confirmed",
       }),
-      "61Mcyn2FvC4TgSU8QoQjx3R66Sv3y4ARdYai9Bbq91ESvMGe1fXYzemdsPS9FaRdyqh3wJA1BapaQhxD2oQx7Jkk"
+      "2eNwUjKhfoWJ1X5cJM4CxGgWkcKToqzwmYe2uXxdXAoemZt9K19m5dtDD3tX2uuzQD1aS9GL2AaHj5pqhLBVGS79"
     );
     console.log(order);
   });
