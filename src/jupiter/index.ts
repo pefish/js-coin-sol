@@ -22,6 +22,8 @@ import {
   WSOL_ADDRESS,
 } from "../constants";
 import { PUMP_FUN_TOKEN_DECIMALS } from "../pumpfun/contants";
+import { RaydiumSwapKeys } from "../raydium";
+import { RaydiumLiquidityPoolV4 } from "../raydium/contants";
 import { findInnerInstructions, getAllFeeOfTx } from "../util";
 import {
   JupiterAggregatorEventAuthority,
@@ -183,7 +185,10 @@ export async function getSwapInstructionsFromJup(
 
 export async function parseJupiterSwapTx(
   transaction: ParsedTransactionWithMeta
-): Promise<Order | null> {
+): Promise<{
+  orderInfo: Order;
+  raydiumSwapKeys: RaydiumSwapKeys | null;
+} | null> {
   if (!transaction.blockTime) {
     return null;
   }
@@ -218,6 +223,7 @@ export async function parseJupiterSwapTx(
     swapInstruIndex
   ) as PartiallyDecodedInstruction[];
 
+  let raydiumSwapKeys: RaydiumSwapKeys | null = null;
   // 找到 swap 事件。如果有多个 swap 事件，取第一个，其他暂时不管
   let swapEventInnerInstruction: PartiallyDecodedInstruction | null = null;
   for (const jupiterSwapInnerInstruction of jupiterSwapInnerInstructions) {
@@ -228,7 +234,40 @@ export async function parseJupiterSwapTx(
         JupiterAggregatorEventAuthority
     ) {
       swapEventInnerInstruction = jupiterSwapInnerInstruction;
-      break;
+    }
+
+    if (
+      jupiterSwapInnerInstruction.programId.toString() ==
+        RaydiumLiquidityPoolV4 &&
+      bs58
+        .decode(jupiterSwapInnerInstruction.data)
+        .subarray(0, 1)
+        .toString("hex") == "09"
+    ) {
+      raydiumSwapKeys = {
+        ammAddress: jupiterSwapInnerInstruction.accounts[1].toString(),
+        ammOpenOrdersAddress:
+          jupiterSwapInnerInstruction.accounts[3].toString(),
+        ammTargetOrdersAddress: "",
+        poolCoinTokenAccountAddress:
+          jupiterSwapInnerInstruction.accounts[4].toString(),
+        poolPcTokenAccountAddress:
+          jupiterSwapInnerInstruction.accounts[5].toString(),
+        serumProgramAddress: jupiterSwapInnerInstruction.accounts[6].toString(),
+        serumMarketAddress: jupiterSwapInnerInstruction.accounts[7].toString(),
+        serumBidsAddress: jupiterSwapInnerInstruction.accounts[8].toString(),
+        serumAsksAddress: jupiterSwapInnerInstruction.accounts[9].toString(),
+        serumEventQueueAddress:
+          jupiterSwapInnerInstruction.accounts[10].toString(),
+        serumCoinVaultAccountAddress:
+          jupiterSwapInnerInstruction.accounts[11].toString(),
+        serumPcVaultAccountAddress:
+          jupiterSwapInnerInstruction.accounts[12].toString(),
+        serumVaultSignerAddress:
+          jupiterSwapInnerInstruction.accounts[13].toString(),
+        coinMintAddress: WSOL_ADDRESS,
+        pcMintAddress: "",
+      };
     }
   }
   if (!swapEventInnerInstruction) {
@@ -271,16 +310,23 @@ export async function parseJupiterSwapTx(
   }
   const feeInfo = getAllFeeOfTx(transaction);
 
+  if (raydiumSwapKeys) {
+    raydiumSwapKeys.pcMintAddress = tokenAddress;
+  }
+
   return {
-    user: transaction.transaction.message.accountKeys[0].pubkey.toString(),
-    tx_id: transaction.transaction.signatures[0],
-    router: swapEventParsedData.amm.toString(),
-    router_name: RouterNames[swapEventParsedData.amm.toString()] || "Unknown",
-    type: orderType,
-    sol_amount: solAmount,
-    token_amount: tokenAmount,
-    token_address: tokenAddress,
-    fee: feeInfo.totalFee,
-    timestamp: transaction.blockTime * 1000,
+    orderInfo: {
+      user: transaction.transaction.message.accountKeys[0].pubkey.toString(),
+      tx_id: transaction.transaction.signatures[0],
+      router: swapEventParsedData.amm.toString(),
+      router_name: RouterNames[swapEventParsedData.amm.toString()] || "Unknown",
+      type: orderType,
+      sol_amount: solAmount,
+      token_amount: tokenAmount,
+      token_address: tokenAddress,
+      fee: feeInfo.totalFee,
+      timestamp: transaction.blockTime * 1000,
+    },
+    raydiumSwapKeys,
   };
 }

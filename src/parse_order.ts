@@ -126,12 +126,12 @@ export async function parseOrderTransaction(
   transaction: ParsedTransactionWithMeta
 ): Promise<{
   order: Order;
-  extraData: RaydiumSwapKeys | null;
+  raydiumSwapKeys: RaydiumSwapKeys | null;
 } | null> {
   const txId = transaction.transaction.signatures[0].toString();
   let result: {
     order: Order;
-    extraData: RaydiumSwapKeys | null;
+    raydiumSwapKeys: RaydiumSwapKeys | null;
   } | null = null;
 
   for (const [
@@ -140,7 +140,6 @@ export async function parseOrderTransaction(
   ] of transaction.transaction.message.instructions.entries()) {
     switch (instruction.programId.toString()) {
       case RaydiumLiquidityPoolV4:
-        logger.debug(`<${txId}> is raydium swap`);
         try {
           const parseRaydiumSwapResult = await parseRaydiumSwapTx(
             connection,
@@ -149,9 +148,10 @@ export async function parseOrderTransaction(
           if (!parseRaydiumSwapResult) {
             continue;
           }
+          logger.debug(`<${txId}> is raydium swap`);
           result = {
             order: parseRaydiumSwapResult.orderInfo,
-            extraData: parseRaydiumSwapResult.raydiumSwapKeys,
+            raydiumSwapKeys: parseRaydiumSwapResult.raydiumSwapKeys,
           };
         } catch (err) {
           logger.debug(err);
@@ -162,7 +162,6 @@ export async function parseOrderTransaction(
       //   // https://solscan.io/tx/4NgCWFiKJgUmP1A1DE468AfTBmDeVDLtNkUEVUgBq2Xb93V6qu77DWhg5mAUs9fi2AgK1tLNR4XP5aT8ww2KP5DF
       //   continue;
       case MeteoraPoolsProgram:
-        logger.debug(`<${txId}> is meteora swap`);
         try {
           const parseMeteoraSwapResult = await parseMeteoraSwapTx(
             connection,
@@ -171,9 +170,10 @@ export async function parseOrderTransaction(
           if (!parseMeteoraSwapResult) {
             continue;
           }
+          logger.debug(`<${txId}> is meteora swap`);
           result = {
             order: parseMeteoraSwapResult,
-            extraData: null,
+            raydiumSwapKeys: null,
           };
         } catch (err) {
           logger.debug(err);
@@ -181,15 +181,15 @@ export async function parseOrderTransaction(
         }
         break;
       case JupiterAggregatorV6:
-        logger.debug(`<${txId}> is jupiter swap`);
         try {
           const parseJupiterSwapResult = await parseJupiterSwapTx(transaction);
           if (!parseJupiterSwapResult) {
             continue;
           }
+          logger.debug(`<${txId}> is jupiter swap`);
           result = {
-            order: parseJupiterSwapResult,
-            extraData: null,
+            order: parseJupiterSwapResult.orderInfo,
+            raydiumSwapKeys: parseJupiterSwapResult.raydiumSwapKeys,
           };
         } catch (err) {
           logger.debug(err);
@@ -204,7 +204,7 @@ export async function parseOrderTransaction(
           }
           result = {
             order: parseResult,
-            extraData: null,
+            raydiumSwapKeys: null,
           };
         } catch (err) {
           logger.debug(err);
@@ -220,7 +220,7 @@ export async function parseOrderTransaction(
           }
           result = {
             order: parsePumpFunSwapResult,
-            extraData: null,
+            raydiumSwapKeys: null,
           };
         } catch (err) {
           logger.debug(err);
@@ -241,7 +241,7 @@ export async function parseOrderTransactionByTxId(
   txId: string
 ): Promise<{
   order: Order;
-  extraData: RaydiumSwapKeys | null;
+  raydiumSwapKeys: RaydiumSwapKeys | null;
 } | null> {
   logger.debug(`parsing <${txId}>...`);
   const transaction = await getParsedTransaction(connection, txId);

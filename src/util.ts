@@ -283,7 +283,7 @@ export async function placeOrder(
   }
 ): Promise<{
   order: Order;
-  extraData: RaydiumSwapKeys | null;
+  raydiumSwapKeys: RaydiumSwapKeys | null;
 }> {
   const wallet = new Wallet(Keypair.fromSecretKey(bs58.decode(priv)));
 
