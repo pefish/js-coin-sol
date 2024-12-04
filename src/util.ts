@@ -308,7 +308,7 @@ export async function placeOrder(
       type,
       tokenAddress,
       amount,
-      opts.slippage || 500,
+      opts.slippage || 1000,
       opts.raydiumSwapKeys,
       !!opts.isCloseTokenAccount
     );
