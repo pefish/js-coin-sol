@@ -26,7 +26,6 @@ import {
   ComputeBudgetAddress,
   Order,
   OrderType,
-  RouterTradeCULimits,
   RouterType,
   SOL_DECIMALS,
   WSOL_ADDRESS,
@@ -288,57 +287,41 @@ export async function placeOrder(
 }> {
   const wallet = new Wallet(Keypair.fromSecretKey(bs58.decode(priv)));
 
-  let instructions: TransactionInstruction[] = [];
-  switch (routerType) {
-    case "PumpFun":
-      instructions = await getPumpFunSwapInstructions(
-        connection,
-        wallet.publicKey.toString(),
-        type,
-        tokenAddress,
-        amount,
-        opts.slippage || 1000,
-        !!opts.isCloseTokenAccount
-      );
-      break;
-    case "Raydium":
-      if (!opts.raydiumSwapKeys) {
-        instructions = await getSwapInstructionsFromJup(
-          connection,
-          wallet.publicKey.toString(),
-          type,
-          tokenAddress,
-          amount,
-          opts.slippage || 1000,
-          !!opts.isCloseTokenAccount
-        );
-        break;
-      }
-      instructions = await getRaydiumSwapInstructions(
-        connection,
-        wallet.publicKey.toString(),
-        type,
-        tokenAddress,
-        amount,
-        opts.slippage || 500,
-        opts.raydiumSwapKeys,
-        !!opts.isCloseTokenAccount
-      );
-      break;
-    default:
-      instructions = await getSwapInstructionsFromJup(
-        connection,
-        wallet.publicKey.toString(),
-        type,
-        tokenAddress,
-        amount,
-        opts.slippage || 1000,
-        !!opts.isCloseTokenAccount
-      );
-      break;
-  }
-  if (instructions.length == 0) {
-    throw new Error("Generate instructions failed.");
+  let getSwapInstructionsResult: {
+    instructions: TransactionInstruction[];
+    computeUnits: number;
+  };
+  if (routerType == "PumpFun") {
+    getSwapInstructionsResult = await getPumpFunSwapInstructions(
+      connection,
+      wallet.publicKey.toString(),
+      type,
+      tokenAddress,
+      amount,
+      opts.slippage || 1000,
+      !!opts.isCloseTokenAccount
+    );
+  } else if (routerType == "Raydium" && opts.raydiumSwapKeys) {
+    getSwapInstructionsResult = await getRaydiumSwapInstructions(
+      connection,
+      wallet.publicKey.toString(),
+      type,
+      tokenAddress,
+      amount,
+      opts.slippage || 500,
+      opts.raydiumSwapKeys,
+      !!opts.isCloseTokenAccount
+    );
+  } else {
+    getSwapInstructionsResult = await getSwapInstructionsFromJup(
+      connection,
+      wallet.publicKey.toString(),
+      type,
+      tokenAddress,
+      amount,
+      opts.slippage || 1000,
+      !!opts.isCloseTokenAccount
+    );
   }
 
   // 评估网络费
@@ -352,7 +335,7 @@ export async function placeOrder(
       ComputeBudgetProgram.setComputeUnitPrice({
         microLamports: 0,
       }),
-      ...instructions,
+      ...getSwapInstructionsResult.instructions,
     ],
   }).compileToV0Message();
 
@@ -379,12 +362,12 @@ export async function placeOrder(
     recentBlockhash: latestBlockhashInfo.blockhash,
     instructions: [
       ComputeBudgetProgram.setComputeUnitLimit({
-        units: opts.computeUnitLimit || RouterTradeCULimits[routerType][type],
+        units: opts.computeUnitLimit || getSwapInstructionsResult.computeUnits,
       }),
       ComputeBudgetProgram.setComputeUnitPrice({
         microLamports: computeUnitPrice,
       }),
-      ...instructions,
+      ...getSwapInstructionsResult.instructions,
     ],
   }).compileToV0Message();
 

@@ -9,7 +9,10 @@ export declare function parseBondingCurveAddressData(connection: Connection, bon
     complete: boolean;
 }>;
 export declare function getPumpFunSwapInstructions(connection: Connection, userAddress: string, type: "buy" | "sell", tokenAddress: string, amount: string, // buy 的话就是 sol 的数量，sell 就是 token 的数量
-slippage: number, isCloseTokenAccount?: boolean): Promise<TransactionInstruction[]>;
+slippage: number, isCloseTokenAccount?: boolean): Promise<{
+    instructions: TransactionInstruction[];
+    computeUnits: number;
+}>;
 export declare function parsePumpFunSwapTx(transaction: ParsedTransactionWithMeta): Promise<Order | null>;
 export declare function parsePumpFunRemoveLiqTx(connection: Connection, transaction: ParsedTransactionWithMeta): Promise<{
     destination: string;

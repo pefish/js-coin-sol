@@ -26,5 +26,8 @@ export interface QuoteResponseType {
     contextSlot: number;
     timeTaken: number;
 }
-export declare function getSwapInstructionsFromJup(connection: Connection, userAddress: string, type: "buy" | "sell", tokenAddress: string, amount: string, slippage: number, isCloseTokenAccount?: boolean): Promise<TransactionInstruction[]>;
+export declare function getSwapInstructionsFromJup(connection: Connection, userAddress: string, type: "buy" | "sell", tokenAddress: string, amount: string, slippage: number, isCloseTokenAccount?: boolean): Promise<{
+    instructions: TransactionInstruction[];
+    computeUnits: number;
+}>;
 export declare function parseJupiterSwapTx(transaction: ParsedTransactionWithMeta): Promise<Order | null>;

@@ -67,30 +67,3 @@ export const RouterNames: { [x: string]: RouterType } = {
   [RaydiumConcentratedLiquidity]: "Raydium",
   [MeteoraPoolsProgram]: "Meteora",
 };
-
-export const RouterTradeCULimits: {
-  [x in RouterType]: {
-    [x in OrderType]: number;
-  };
-} = {
-  Orca: {
-    buy: 80000,
-    sell: 80000,
-  },
-  PumpFun: {
-    buy: 80000,
-    sell: 80000,
-  },
-  Raydium: {
-    buy: 80000,
-    sell: 80000,
-  },
-  Meteora: {
-    buy: 80000,
-    sell: 80000,
-  },
-  Unknown: {
-    buy: 80000,
-    sell: 80000,
-  },
-};

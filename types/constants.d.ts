@@ -43,12 +43,8 @@ export interface Order {
     fee: string;
     token_address: string;
     user: string;
+    timestamp: number;
 }
 export declare const RouterNames: {
     [x: string]: RouterType;
-};
-export declare const RouterTradeCULimits: {
-    [x in RouterType]: {
-        [x in OrderType]: number;
-    };
 };

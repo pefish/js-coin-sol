@@ -216,7 +216,11 @@ export async function getRaydiumSwapInstructions(
   slippage: number,
   raydiumPoolInfo: RaydiumSwapKeys,
   isCloseTokenAccount: boolean = false
-): Promise<TransactionInstruction[]> {
+): Promise<{
+  instructions: TransactionInstruction[];
+  computeUnits: number;
+}> {
+  let computeUnits = 30000;
   const instructions: TransactionInstruction[] = [];
 
   const tokenAddressPKey = new PublicKey(tokenAddress);
@@ -418,6 +422,7 @@ export async function getRaydiumSwapInstructions(
         new PublicKey(WSOL_ADDRESS)
       )
     );
+    computeUnits += 40000;
   }
 
   // 充值 wsol
@@ -446,6 +451,7 @@ export async function getRaydiumSwapInstructions(
         tokenAddressPKey
       )
     );
+    computeUnits += 40000;
   }
 
   instructions.push(
@@ -490,7 +496,10 @@ export async function getRaydiumSwapInstructions(
     }
   }
 
-  return instructions;
+  return {
+    instructions,
+    computeUnits,
+  };
 }
 
 export async function getLPInfoFromLpAddress(

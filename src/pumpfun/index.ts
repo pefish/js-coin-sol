@@ -85,8 +85,12 @@ export async function getPumpFunSwapInstructions(
   amount: string, // buy 的话就是 sol 的数量，sell 就是 token 的数量
   slippage: number,
   isCloseTokenAccount: boolean = false
-): Promise<TransactionInstruction[]> {
+): Promise<{
+  instructions: TransactionInstruction[];
+  computeUnits: number;
+}> {
   const instructions: TransactionInstruction[] = [];
+  let computeUnits = 30000;
 
   const tokenAddressPKey = new PublicKey(tokenAddress);
   const userPKey = new PublicKey(userAddress);
@@ -228,6 +232,7 @@ export async function getPumpFunSwapInstructions(
         tokenAddressPKey
       )
     );
+    computeUnits += 40000;
   }
   instructions.push(instruction);
 
@@ -258,7 +263,10 @@ export async function getPumpFunSwapInstructions(
     }
   }
 
-  return instructions;
+  return {
+    instructions,
+    computeUnits,
+  };
 }
 
 export async function parsePumpFunSwapTx(

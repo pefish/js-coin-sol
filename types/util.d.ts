@@ -39,7 +39,7 @@ export declare function estimateComputeUnitPriceByHelius(heliusUrl: string, writ
 export declare function placeOrder(logger: ILogger, connection: Connection, priv: string, type: OrderType, amount: string, tokenAddress: string, routerType: RouterType, opts: {
     nodeUrls?: string[];
     slippage?: number;
-    raydiumSwapKeys?: RaydiumSwapKeys;
+    raydiumSwapKeys?: RaydiumSwapKeys | null;
     isCloseTokenAccount?: boolean;
     computeUnitLimit?: number;
     accelerationLevel?: number;

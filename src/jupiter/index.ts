@@ -64,7 +64,10 @@ export async function getSwapInstructionsFromJup(
   amount: string,
   slippage: number,
   isCloseTokenAccount: boolean = false
-): Promise<TransactionInstruction[]> {
+): Promise<{
+  instructions: TransactionInstruction[];
+  computeUnits: number;
+}> {
   const tokenAddressPKey = new PublicKey(tokenAddress);
   const userPKey = new PublicKey(userAddress);
 
@@ -100,7 +103,6 @@ export async function getSwapInstructionsFromJup(
         minBps: slippage,
         maxBps: slippage * 10,
       },
-      dynamicComputeUnitLimit: true,
       // computeUnitPriceMicroLamports: computeUnitPrice,
       //   prioritizationFeeLamports: "auto",
     }),
@@ -169,7 +171,10 @@ export async function getSwapInstructionsFromJup(
     }
   }
 
-  return instructions;
+  return {
+    instructions,
+    computeUnits: 80000,
+  };
 }
 
 export async function parseJupiterSwapTx(

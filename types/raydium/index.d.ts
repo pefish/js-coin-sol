@@ -114,7 +114,10 @@ export interface RaydiumSwapKeys {
     pcMintAddress: string;
 }
 export declare function getRaydiumSwapInstructions(connection: Connection, userAddress: string, type: "buy" | "sell", tokenAddress: string, amount: string, // buy 的话就是 sol 的数量，sell 就是 token 的数量
-slippage: number, raydiumPoolInfo: RaydiumSwapKeys, isCloseTokenAccount?: boolean): Promise<TransactionInstruction[]>;
+slippage: number, raydiumPoolInfo: RaydiumSwapKeys, isCloseTokenAccount?: boolean): Promise<{
+    instructions: TransactionInstruction[];
+    computeUnits: number;
+}>;
 export declare function getLPInfoFromLpAddress(connection: Connection, lpAddress: string): Promise<{
     tokenAddress: string;
     initTokenAmountInLP: string;
@@ -146,4 +149,5 @@ export declare function parseRaydiumSwapTx(connection: Connection, transaction: 
     orderInfo: Order;
     raydiumSwapKeys: RaydiumSwapKeys;
 } | null>;
+export declare function getTokenPrice(connection: Connection, solVaultAddress: string, tokenVaultAddress: string): Promise<string>;
 export {};
