@@ -68,6 +68,8 @@ export async function getSwapInstructionsFromJup(
   instructions: TransactionInstruction[];
   computeUnits: number;
 }> {
+  let computeUnits = 40000;
+
   const tokenAddressPKey = new PublicKey(tokenAddress);
   const userPKey = new PublicKey(userAddress);
 
@@ -130,6 +132,8 @@ export async function getSwapInstructionsFromJup(
     });
   };
 
+  computeUnits += 40000 * setupInstructions.length;
+
   const instructions = [
     ...setupInstructions.map(deserializeInstruction),
     deserializeInstruction(swapInstruction),
@@ -173,7 +177,7 @@ export async function getSwapInstructionsFromJup(
 
   return {
     instructions,
-    computeUnits: 80000,
+    computeUnits,
   };
 }
 
