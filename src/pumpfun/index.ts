@@ -90,7 +90,7 @@ export async function getPumpFunSwapInstructions(
   computeUnits: number;
 }> {
   const instructions: TransactionInstruction[] = [];
-  let computeUnits = 30000;
+  let computeUnits = 40000;
 
   const tokenAddressPKey = new PublicKey(tokenAddress);
   const userPKey = new PublicKey(userAddress);

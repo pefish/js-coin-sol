@@ -220,7 +220,7 @@ export async function getRaydiumSwapInstructions(
   instructions: TransactionInstruction[];
   computeUnits: number;
 }> {
-  let computeUnits = 30000;
+  let computeUnits = 40000;
   const instructions: TransactionInstruction[] = [];
 
   const tokenAddressPKey = new PublicKey(tokenAddress);
