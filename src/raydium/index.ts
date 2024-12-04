@@ -422,7 +422,7 @@ export async function getRaydiumSwapInstructions(
         new PublicKey(WSOL_ADDRESS)
       )
     );
-    computeUnits += 40000;
+    computeUnits += 30000;
   }
 
   // 充值 wsol
@@ -451,7 +451,7 @@ export async function getRaydiumSwapInstructions(
         tokenAddressPKey
       )
     );
-    computeUnits += 40000;
+    computeUnits += 30000;
   }
 
   instructions.push(

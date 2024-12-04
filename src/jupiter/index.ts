@@ -132,7 +132,7 @@ export async function getSwapInstructionsFromJup(
     });
   };
 
-  computeUnits += 40000 * setupInstructions.length;
+  computeUnits += 30000 * setupInstructions.length;
 
   const instructions = [
     ...setupInstructions.map(deserializeInstruction),

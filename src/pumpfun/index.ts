@@ -232,7 +232,7 @@ export async function getPumpFunSwapInstructions(
         tokenAddressPKey
       )
     );
-    computeUnits += 40000;
+    computeUnits += 30000;
   }
   instructions.push(instruction);
 
