@@ -45,7 +45,7 @@ export declare function placeOrder(logger: ILogger, connection: Connection, priv
     accelerationLevel?: number;
 }): Promise<{
     order: Order;
-    extraData: RaydiumSwapKeys | null;
+    raydiumSwapKeys: RaydiumSwapKeys | null;
 }>;
 export declare function getDepositWSOLInstructions(connection: Connection, fromAddress: string, toAddress: string, amount: string): Promise<TransactionInstruction[]>;
 export declare function estimateComputeUnitPrice(connection: Connection, writableAccounts: string[]): Promise<number>;

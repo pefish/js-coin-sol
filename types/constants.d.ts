@@ -31,7 +31,7 @@ export interface GetParsedAccountInfoData {
     parsed: ParsedTokenAccountData;
     space: number;
 }
-export type RouterType = "Orca" | "PumpFun" | "Raydium" | "Meteora" | "Unknown";
+export type RouterType = "Orca" | "PumpFun" | "Raydium" | "Meteora" | "SolFi" | "Unknown";
 export type OrderType = "buy" | "sell";
 export interface Order {
     type: OrderType;

@@ -1,5 +1,4 @@
 import TimeUtil from "@pefish/js-util-time";
-import { Account, TOKEN_PROGRAM_ID, unpackAccount } from "@solana/spl-token";
 import {
   AccountInfo,
   BlockhashWithExpiryBlockHeight,
@@ -165,13 +164,29 @@ export async function getMultipleRawAccountsInfo(
   }
 }
 
-// 获取 PDA 账户的数据信息
-export async function getAssociatedAccountInfo(
+// 获取 token account 账户的数据信息
+export async function getAssociatedTokenAccountInfo(
   connection: Connection,
-  address: PublicKey
-): Promise<Account> {
-  const info = await getRawAccountInfo(connection, address, "confirmed");
-  return unpackAccount(address, info, TOKEN_PROGRAM_ID);
+  address: string
+): Promise<{
+  isNative: boolean;
+  mint: string;
+  owner: string;
+  state: string;
+  tokenAmount: {
+    amount: string;
+    decimals: number;
+    uiAmount: number;
+    uiAmountString: string;
+  };
+}> {
+  const accountInfo = await getParsedAccountInfo(
+    connection,
+    new PublicKey(address)
+  );
+  const accountInfoData = accountInfo.data as ParsedAccountData;
+
+  return accountInfoData.parsed["info"];
 }
 
 export async function getRawAccountInfo(

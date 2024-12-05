@@ -1,5 +1,6 @@
 import { Connection, ParsedTransactionWithMeta, TransactionInstruction } from "@solana/web3.js";
 import { Order } from "../constants";
+import { RaydiumSwapKeys } from "../raydium";
 export interface QuoteResponseType {
     inputMint: string;
     inAmount: string;
@@ -30,4 +31,7 @@ export declare function getSwapInstructionsFromJup(connection: Connection, userA
     instructions: TransactionInstruction[];
     computeUnits: number;
 }>;
-export declare function parseJupiterSwapTx(transaction: ParsedTransactionWithMeta): Promise<Order | null>;
+export declare function parseJupiterSwapTx(transaction: ParsedTransactionWithMeta): Promise<{
+    orderInfo: Order;
+    raydiumSwapKeys: RaydiumSwapKeys | null;
+} | null>;

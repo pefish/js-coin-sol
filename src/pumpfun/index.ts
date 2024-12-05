@@ -27,7 +27,7 @@ import {
 import { Order, RouterNames, SOL_DECIMALS } from "../constants";
 import { getSwapInstructionsFromJup } from "../jupiter";
 import {
-  getAssociatedAccountInfo,
+  getAssociatedTokenAccountInfo,
   getRawAccountInfo,
 } from "../solana-web3/ignore429";
 import { findInnerInstructions, getAllFeeOfTx } from "../util";
@@ -379,9 +379,9 @@ export async function parsePumpFunRemoveLiqTx(
 
   const feeInfo = getAllFeeOfTx(transaction);
 
-  const associatedDestinationInfo = await getAssociatedAccountInfo(
+  const associatedDestinationInfo = await getAssociatedTokenAccountInfo(
     connection,
-    withdrawInstru.accounts[5]
+    withdrawInstru.accounts[5].toString()
   );
 
   return {

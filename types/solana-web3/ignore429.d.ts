@@ -1,4 +1,3 @@
-import { Account } from "@solana/spl-token";
 import { AccountInfo, BlockhashWithExpiryBlockHeight, Commitment, ConfirmedSignatureInfo, Connection, Finality, GetAccountInfoConfig, GetMultipleAccountsConfig, LogsCallback, LogsFilter, ParsedAccountData, ParsedTransactionWithMeta, PublicKey, RecentPrioritizationFees, SendOptions, SignaturesForAddressOptions, TransactionConfirmationStrategy, TransactionSignature } from "@solana/web3.js";
 export declare function isIgnoreErr(err: any): boolean;
 export declare function getParsedTransaction(connection: Connection, txId: string): Promise<ParsedTransactionWithMeta>;
@@ -8,7 +7,18 @@ export declare function confirmTransaction(connection: Connection, strategy: Tra
 export declare function onLogs(connection: Connection, filter: LogsFilter, callback: LogsCallback, commitment?: Commitment): Promise<void>;
 export declare function getMultipleParsedAccounts(connection: Connection, publicKeys: PublicKey[], rawConfig?: GetMultipleAccountsConfig): Promise<(AccountInfo<Buffer | ParsedAccountData> | null)[]>;
 export declare function getMultipleRawAccountsInfo(connection: Connection, publicKeys: PublicKey[], rawConfig?: GetMultipleAccountsConfig): Promise<(AccountInfo<Buffer> | null)[]>;
-export declare function getAssociatedAccountInfo(connection: Connection, address: PublicKey): Promise<Account>;
+export declare function getAssociatedTokenAccountInfo(connection: Connection, address: string): Promise<{
+    isNative: boolean;
+    mint: string;
+    owner: string;
+    state: string;
+    tokenAmount: {
+        amount: string;
+        decimals: number;
+        uiAmount: number;
+        uiAmountString: string;
+    };
+}>;
 export declare function getRawAccountInfo(connection: Connection, publicKey: PublicKey, commitmentOrConfig?: Commitment | GetAccountInfoConfig): Promise<AccountInfo<Buffer>>;
 export declare function getParsedAccountInfo(connection: Connection, publicKey: PublicKey, commitmentOrConfig?: Commitment | GetAccountInfoConfig): Promise<AccountInfo<Buffer | ParsedAccountData>>;
 export declare function getSignaturesForAddress(connection: Connection, address: PublicKey, options?: SignaturesForAddressOptions, commitment?: Finality): Promise<ConfirmedSignatureInfo[]>;

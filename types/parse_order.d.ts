@@ -4,9 +4,9 @@ import { ILogger } from "@pefish/js-logger";
 import { RaydiumSwapKeys } from "./raydium";
 export declare function parseOrderTransaction(logger: ILogger, connection: Connection, transaction: ParsedTransactionWithMeta): Promise<{
     order: Order;
-    extraData: RaydiumSwapKeys | null;
+    raydiumSwapKeys: RaydiumSwapKeys | null;
 } | null>;
 export declare function parseOrderTransactionByTxId(logger: ILogger, connection: Connection, txId: string): Promise<{
     order: Order;
-    extraData: RaydiumSwapKeys | null;
+    raydiumSwapKeys: RaydiumSwapKeys | null;
 } | null>;
