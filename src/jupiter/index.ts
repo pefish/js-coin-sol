@@ -231,7 +231,8 @@ export async function parseJupiterSwapTx(
       jupiterSwapInnerInstruction.programId.toString() == JupiterAggregatorV6 &&
       jupiterSwapInnerInstruction.accounts.length == 1 &&
       jupiterSwapInnerInstruction.accounts[0].toString() ==
-        JupiterAggregatorEventAuthority
+        JupiterAggregatorEventAuthority &&
+      !swapEventInnerInstruction
     ) {
       swapEventInnerInstruction = jupiterSwapInnerInstruction;
     }

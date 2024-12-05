@@ -4,6 +4,7 @@ import {
   RaydiumConcentratedLiquidity,
   RaydiumLiquidityPoolV4,
 } from "./raydium/contants";
+import { SolFiRouter } from "./sol-fi/contants";
 
 export const SOL_DECIMALS = 9;
 export const WSOL_ADDRESS = "So11111111111111111111111111111111111111112";
@@ -43,7 +44,13 @@ export interface GetParsedAccountInfoData {
   space: number;
 }
 
-export type RouterType = "Orca" | "PumpFun" | "Raydium" | "Meteora" | "Unknown";
+export type RouterType =
+  | "Orca"
+  | "PumpFun"
+  | "Raydium"
+  | "Meteora"
+  | "SolFi"
+  | "Unknown";
 
 export type OrderType = "buy" | "sell";
 
@@ -66,4 +73,5 @@ export const RouterNames: { [x: string]: RouterType } = {
   [RaydiumLiquidityPoolV4]: "Raydium",
   [RaydiumConcentratedLiquidity]: "Raydium",
   [MeteoraPoolsProgram]: "Meteora",
+  [SolFiRouter]: "SolFi",
 };
