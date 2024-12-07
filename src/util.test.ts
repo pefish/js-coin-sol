@@ -157,4 +157,19 @@ describe("util", () => {
     const result = await getAllFeeOfTx(tx);
     console.log(result);
   });
+
+  it("getParsedTransaction", async () => {
+    return;
+    const conn = new Connection("https://api.mainnet-beta.solana.com", {
+      commitment: "confirmed",
+    });
+    const tx = await conn.getTransaction(
+      "48LZvC8oggXXCipaFJG2ebdwLzFS94omfwgnUJxf3ferS8ttDG4qYgWxrPkzC51Uv4R7xvzBNfo93DuoKSNLg5yZ",
+      {
+        commitment: "confirmed",
+        maxSupportedTransactionVersion: 0,
+      }
+    );
+    console.log(tx);
+  });
 });

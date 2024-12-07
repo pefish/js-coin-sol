@@ -387,30 +387,36 @@ export async function placeOrder(
 
   logger.info(`<${txId}> 广播成功`);
   await TimeUtil.sleep(3000);
-  const parsedTransaction = await TimeUtil.timeout<ParsedTransactionWithMeta>(
-    async () => {
-      while (true) {
-        try {
-          const tx: ParsedTransactionWithMeta | null =
-            await connection.getParsedTransaction(txId, {
-              commitment: "confirmed",
-              maxSupportedTransactionVersion: 0,
-            });
-          if (!tx) {
-            logger.info(`<${txId}> 等待确认...`);
-            await TimeUtil.sleep(2000);
-            continue;
-          }
-          return tx;
-        } catch (err) {
-          if (!isIgnoreErr(err)) {
-            throw err;
+  const parsedTransaction =
+    await TimeUtil.timeout<ParsedTransactionWithMeta | null>(
+      async (abortSignal: AbortSignal) => {
+        while (!abortSignal.aborted) {
+          try {
+            const tx: ParsedTransactionWithMeta | null =
+              await connection.getParsedTransaction(txId, {
+                commitment: "confirmed",
+                maxSupportedTransactionVersion: 0,
+              });
+            if (!tx) {
+              logger.info(`<${txId}> 等待确认...`);
+              await TimeUtil.sleep(2000);
+              continue;
+            }
+            return tx;
+          } catch (err) {
+            if (!isIgnoreErr(err)) {
+              throw err;
+            }
           }
         }
-      }
-    },
-    30000
-  );
+        return null;
+      },
+      30000,
+      new Error(`<${txId}> 确认超时`)
+    );
+  if (!parsedTransaction) {
+    throw new Error(`<${txId}> 确认失败`);
+  }
   logger.info(`<${txId}> 已确认`);
   if (parsedTransaction.meta && parsedTransaction.meta.err) {
     throw new Error(

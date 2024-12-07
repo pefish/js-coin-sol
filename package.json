@@ -1,6 +1,6 @@
 {
   "name": "@pefish/js-sol-trade",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "app_description",
   "keywords": [
     "common",
@@ -43,7 +43,7 @@
     "@pefish/js-http": "^0.2.1",
     "@pefish/js-logger": "^1.0.4",
     "@pefish/js-node-assist": "^2.1.0",
-    "@pefish/js-util-time": "^0.1.4",
+    "@pefish/js-util-time": "^0.1.6",
     "@raydium-io/raydium-sdk-v2": "^0.1.73-alpha",
     "@solana/web3.js": "^1.95.4",
     "axios": "^1.7.7"
