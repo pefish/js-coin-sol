@@ -179,11 +179,14 @@ export async function getAssociatedTokenAccountInfo(
     uiAmount: number;
     uiAmountString: string;
   };
-}> {
+} | null> {
   const accountInfo = await getParsedAccountInfo(
     connection,
     new PublicKey(address)
   );
+  if (!accountInfo) {
+    return null;
+  }
   const accountInfoData = accountInfo.data as ParsedAccountData;
 
   return accountInfoData.parsed["info"];
@@ -193,14 +196,12 @@ export async function getRawAccountInfo(
   connection: Connection,
   publicKey: PublicKey,
   commitmentOrConfig?: Commitment | GetAccountInfoConfig
-): Promise<AccountInfo<Buffer>> {
+): Promise<AccountInfo<Buffer> | null> {
   let result: AccountInfo<Buffer> | null = null;
   while (true) {
     try {
       result = await connection.getAccountInfo(publicKey, commitmentOrConfig);
-      if (result) {
-        return result;
-      }
+      return result;
     } catch (err) {
       if (!isIgnoreErr(err)) {
         throw err;
@@ -214,14 +215,14 @@ export async function getParsedAccountInfo(
   connection: Connection,
   publicKey: PublicKey,
   commitmentOrConfig?: Commitment | GetAccountInfoConfig
-): Promise<AccountInfo<Buffer | ParsedAccountData>> {
+): Promise<AccountInfo<Buffer | ParsedAccountData> | null> {
   while (true) {
     try {
       const result = await connection.getParsedAccountInfo(
         publicKey,
         commitmentOrConfig
       );
-      if (result && result.value) {
+      if (result) {
         return result.value;
       }
     } catch (err) {

@@ -77,7 +77,7 @@ describe("util", () => {
     });
     const tx = await getParsedTransaction(
       conn,
-      "Fdm5rAJhWrAPJ2DxAo185Ltqz3YLEfbk8GRZZT354Lho567p3kWBbSu8HDgg88njoad7R58dhMckB9niPGDuGp5"
+      "5q4r66FuVQYsRH4aNcAPz8Ubc5YpYMwHu4fikBUkXvhC7Pv7JGmWmsRgsCr7yzy379GNfWb7JSqPRjWj1vNa1Kh5"
     );
     const result = await parsePumpFunRemoveLiqTx(conn, tx);
     console.log(result);

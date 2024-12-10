@@ -172,4 +172,16 @@ describe("util", () => {
     );
     console.log(tx);
   });
+
+  it("getTokenMetadata", async () => {
+    return;
+    const conn = new Connection("https://api.mainnet-beta.solana.com", {
+      commitment: "confirmed",
+    });
+    const data = await getTokenMetadata(
+      conn,
+      "9Lg5NaaSxvpoh6wtCCUs4QAW4bccZGzqGPuswabwoNSK"
+    );
+    console.log(data);
+  });
 });
