@@ -110,6 +110,9 @@ export async function parseMeteoraSwapTx(
     connection,
     new PublicKey(tokenVaultAddress)
   );
+  if (!parsedAccountInfo) {
+    throw new Error(`tokenVaultAddress <${tokenVaultAddress}> is null.`);
+  }
   const accountData = parsedAccountInfo.data as ParsedAccountData;
   const tokenAddress = accountData.parsed["info"]["mint"];
   const tokenDecimals = accountData.parsed["info"]["tokenAmount"][

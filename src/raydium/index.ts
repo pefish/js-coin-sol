@@ -715,6 +715,9 @@ export async function parseRaydiumSwapTx(
     connection,
     new PublicKey(tokenPoolAddress)
   );
+  if (!parsedAccountInfo) {
+    throw new Error(`tokenPoolAddress <${tokenPoolAddress}> is null.`);
+  }
   const accountData = parsedAccountInfo.data as ParsedAccountData;
   const tokenAddress = accountData.parsed["info"]["mint"];
 

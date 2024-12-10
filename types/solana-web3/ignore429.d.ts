@@ -18,8 +18,8 @@ export declare function getAssociatedTokenAccountInfo(connection: Connection, ad
         uiAmount: number;
         uiAmountString: string;
     };
-}>;
-export declare function getRawAccountInfo(connection: Connection, publicKey: PublicKey, commitmentOrConfig?: Commitment | GetAccountInfoConfig): Promise<AccountInfo<Buffer>>;
-export declare function getParsedAccountInfo(connection: Connection, publicKey: PublicKey, commitmentOrConfig?: Commitment | GetAccountInfoConfig): Promise<AccountInfo<Buffer | ParsedAccountData>>;
+} | null>;
+export declare function getRawAccountInfo(connection: Connection, publicKey: PublicKey, commitmentOrConfig?: Commitment | GetAccountInfoConfig): Promise<AccountInfo<Buffer> | null>;
+export declare function getParsedAccountInfo(connection: Connection, publicKey: PublicKey, commitmentOrConfig?: Commitment | GetAccountInfoConfig): Promise<AccountInfo<Buffer | ParsedAccountData> | null>;
 export declare function getSignaturesForAddress(connection: Connection, address: PublicKey, options?: SignaturesForAddressOptions, commitment?: Finality): Promise<ConfirmedSignatureInfo[]>;
 export declare function sendRawTransaction(connection: Connection, rawTransaction: Buffer | Uint8Array | Array<number>, options?: SendOptions): Promise<TransactionSignature>;

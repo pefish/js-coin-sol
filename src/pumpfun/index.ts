@@ -57,6 +57,9 @@ export async function parseBondingCurveAddressData(
     connection,
     new PublicKey(bondingCurveAddress)
   );
+  if (!parsedAccount) {
+    throw new Error(`bondingCurve <${bondingCurveAddress}> is null.`);
+  }
   const schema = struct([
     u64("discriminator"),
     u64("virtualTokenReserves"),
@@ -379,10 +382,16 @@ export async function parsePumpFunRemoveLiqTx(
 
   const feeInfo = getAllFeeOfTx(transaction);
 
+  const destinationTokenAccount = withdrawInstru.accounts[5].toString();
   const associatedDestinationInfo = await getAssociatedTokenAccountInfo(
     connection,
-    withdrawInstru.accounts[5].toString()
+    destinationTokenAccount
   );
+  if (!associatedDestinationInfo) {
+    throw new Error(
+      `destinationTokenAccount <${destinationTokenAccount}> is null.`
+    );
+  }
 
   return {
     associatedSource: withdrawInstru.accounts[4].toString(),
