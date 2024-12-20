@@ -314,7 +314,6 @@ export async function placeOrder(
     );
   } else {
     getSwapInstructionsResult = await getSwapInstructionsFromJup(
-      connection,
       wallet.publicKey.toString(),
       type,
       tokenAddress,

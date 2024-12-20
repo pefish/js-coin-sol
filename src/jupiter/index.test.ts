@@ -8,11 +8,7 @@ describe("util", () => {
 
   it("getSwapInstructionsFromJup", async () => {
     return;
-    const conn = new Connection("https://api.mainnet-beta.solana.com", {
-      commitment: "confirmed",
-    });
     const result = await getSwapInstructionsFromJup(
-      conn,
       "666666iKjytfqJQS8AjVCRfDU7PDFyUYxh7RTmcNnxDW",
       "buy",
       "Avxn1mr2133YnxnyQevCEVGFJNCv55VSWGDn7Rtapump",

@@ -63,8 +63,6 @@ describe("util", () => {
             "9kKWxwdyuooNYFsEeygdL5LsDuy7WrfBBms7rqazirqG",
           poolPcTokenAccountAddress:
             "6Kww3cBGTpctuye8TJk44ksppRhCvpkqfvKHk9BxWxmi",
-          coinMintAddress: "So11111111111111111111111111111111111111112",
-          pcMintAddress: "GvvGuUFnKtsBswuQqeXhTDKB1KXLNHVw522idugTpump",
         },
       }
     );
@@ -136,8 +134,6 @@ describe("util", () => {
             "9kKWxwdyuooNYFsEeygdL5LsDuy7WrfBBms7rqazirqG",
           poolPcTokenAccountAddress:
             "6Kww3cBGTpctuye8TJk44ksppRhCvpkqfvKHk9BxWxmi",
-          coinMintAddress: "So11111111111111111111111111111111111111112",
-          pcMintAddress: "GvvGuUFnKtsBswuQqeXhTDKB1KXLNHVw522idugTpump",
         },
         isCloseTokenAccount: true,
       }

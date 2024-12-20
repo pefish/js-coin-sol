@@ -22,3 +22,23 @@ export declare function parsePumpFunRemoveLiqTx(connection: Connection, transact
     user: string;
     fee: string;
 } | null>;
+export interface TokenMetadata {
+    name: string;
+    symbol: string;
+    description: string;
+    image: string;
+    showName: boolean;
+    createdOn: string;
+    twitter: string;
+    telegram: string;
+    website: string;
+}
+export declare function parsePumpFunCreateTx(parsedTx: ParsedTransactionWithMeta): Promise<{
+    symbol: string;
+    name: string;
+    uri: string;
+    tokenAddress: string;
+    bondingCurve: string;
+    creator: string;
+    metadata: TokenMetadata;
+} | null>;

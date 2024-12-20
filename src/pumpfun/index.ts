@@ -1,16 +1,17 @@
 import { bs58 } from "@coral-xyz/anchor/dist/cjs/utils/bytes";
+import HttpUtil from "@pefish/js-http";
 import { StringUtil } from "@pefish/js-node-assist";
 import {
   bool,
   i64,
   publicKey,
+  str,
   struct,
   SYSTEM_PROGRAM_ID,
   u128,
   u64,
 } from "@raydium-io/raydium-sdk-v2";
 import {
-  Account,
   createAssociatedTokenAccountIdempotentInstruction,
   createCloseAccountInstruction,
   getAccount,
@@ -98,8 +99,7 @@ export async function getPumpFunSwapInstructions(
   const tokenAddressPKey = new PublicKey(tokenAddress);
   const userPKey = new PublicKey(userAddress);
 
-  // 计算出 tokenAccountAddress
-  const tokenAccountAddress = getAssociatedTokenAddressSync(
+  const tokenAssociatedAccount = getAssociatedTokenAddressSync(
     tokenAddressPKey,
     userPKey,
     false
@@ -110,7 +110,6 @@ export async function getPumpFunSwapInstructions(
     new PublicKey(PUMP_FUN_PROGRAM)
   )[0];
 
-  const ASSOCIATED_USER = tokenAccountAddress;
   const associatedBondingCurve = getAssociatedTokenAddressSync(
     tokenAddressPKey,
     bondingCurvePKey,
@@ -123,6 +122,9 @@ export async function getPumpFunSwapInstructions(
     { pubkey: tokenAddressPKey, isSigner: false, isWritable: false },
     { pubkey: bondingCurvePKey, isSigner: false, isWritable: true },
     { pubkey: associatedBondingCurve, isSigner: false, isWritable: true },
+    { pubkey: tokenAssociatedAccount, isSigner: false, isWritable: true },
+    { pubkey: userPKey, isSigner: false, isWritable: true },
+    { pubkey: SYSTEM_PROGRAM_ID, isSigner: false, isWritable: false },
   ];
 
   const bondingCurveInfo = await parseBondingCurveAddressData(
@@ -132,7 +134,6 @@ export async function getPumpFunSwapInstructions(
   if (bondingCurveInfo.virtualTokenReserves == "0") {
     // 代表这个币已经上岸了，需要使用 raydium
     return await getSwapInstructionsFromJup(
-      connection,
       userAddress,
       type,
       tokenAddress,
@@ -146,9 +147,6 @@ export async function getPumpFunSwapInstructions(
   if (type == "buy") {
     keys.push(
       ...[
-        { pubkey: ASSOCIATED_USER, isSigner: false, isWritable: true },
-        { pubkey: userPKey, isSigner: false, isWritable: true },
-        { pubkey: SYSTEM_PROGRAM_ID, isSigner: false, isWritable: false },
         { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },
         { pubkey: RENT, isSigner: false, isWritable: false },
         { pubkey: PUMP_FUN_ACCOUNT, isSigner: false, isWritable: false },
@@ -178,9 +176,6 @@ export async function getPumpFunSwapInstructions(
   } else {
     keys.push(
       ...[
-        { pubkey: tokenAccountAddress, isSigner: false, isWritable: true },
-        { pubkey: userPKey, isSigner: false, isWritable: true },
-        { pubkey: SYSTEM_PROGRAM_ID, isSigner: false, isWritable: false },
         { pubkey: ASSOC_TOKEN_ACC_PROG, isSigner: false, isWritable: false },
         { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },
         { pubkey: PUMP_FUN_ACCOUNT, isSigner: false, isWritable: false },
@@ -215,17 +210,8 @@ export async function getPumpFunSwapInstructions(
     data: data,
   });
 
-  const tokenAssociatedAccount = getAssociatedTokenAddressSync(
-    tokenAddressPKey,
-    userPKey,
-    false
-  );
-  let tokenAssociatedAccountInfo: Account | null = null;
   try {
-    tokenAssociatedAccountInfo = await getAccount(
-      connection,
-      tokenAssociatedAccount
-    );
+    await getAccount(connection, tokenAssociatedAccount);
   } catch (e) {
     instructions.push(
       createAssociatedTokenAccountIdempotentInstruction(
@@ -239,31 +225,10 @@ export async function getPumpFunSwapInstructions(
   }
   instructions.push(instruction);
 
-  if (type == "sell") {
-    if (isCloseTokenAccount) {
-      if (!tokenAssociatedAccountInfo) {
-        throw new Error(
-          "Order is sell, but tokenAssociatedAccountInfo not found."
-        );
-      }
-      const tokenBalance = tokenAssociatedAccountInfo.amount.toString();
-      const afterBal = StringUtil.start(tokenBalance)
-        .sub(tokenAmountWithDecimals)
-        .toNumber();
-      if (afterBal > 0) {
-        throw new Error(
-          `After balance <${afterBal}> not be 0, can not closed.`
-        );
-      }
-
-      instructions.push(
-        createCloseAccountInstruction(
-          tokenAssociatedAccount,
-          userPKey,
-          userPKey
-        )
-      );
-    }
+  if (type == "sell" && isCloseTokenAccount) {
+    instructions.push(
+      createCloseAccountInstruction(tokenAssociatedAccount, userPKey, userPKey)
+    );
   }
 
   return {
@@ -400,5 +365,103 @@ export async function parsePumpFunRemoveLiqTx(
     tokenAddress: associatedDestinationInfo.mint.toString(),
     user: transaction.transaction.message.accountKeys[0].pubkey.toString(),
     fee: feeInfo.totalFee,
+  };
+}
+
+export interface TokenMetadata {
+  name: string;
+  symbol: string;
+  description: string;
+  image: string;
+  showName: boolean;
+  createdOn: string;
+  twitter: string;
+  telegram: string;
+  website: string;
+}
+
+export async function parsePumpFunCreateTx(
+  parsedTx: ParsedTransactionWithMeta
+): Promise<{
+  symbol: string;
+  name: string;
+  uri: string;
+  tokenAddress: string;
+  bondingCurve: string;
+  creator: string;
+  metadata: TokenMetadata;
+} | null> {
+  const instructions = parsedTx.transaction.message.instructions;
+  // 找到调用 create 的指令
+  let createInstru: PartiallyDecodedInstruction | null = null;
+  let createInstruIndex = 0;
+  for (const [index, instruction] of instructions.entries()) {
+    const instru = instruction as PartiallyDecodedInstruction;
+    if (
+      instru.data &&
+      instruction.programId.toString() == PUMP_FUN_PROGRAM.toString() &&
+      bs58.decode(instru.data).subarray(0, 8).toString("hex") ==
+        "181ec828051c0777"
+    ) {
+      createInstru = instru;
+      createInstruIndex = index;
+      // const createEventParsedData = struct([
+      //   u64("id"),
+      //   str("name"),
+      //   str("symbol"),
+      //   str("uri"),
+      // ]).decode(bs58.decode(instru.data));
+      // console.log(createEventParsedData);
+
+      break;
+    }
+  }
+  if (!createInstru) {
+    return null;
+  }
+
+  // 找到创建成功后的事件
+  const createInnerInstructions = findInnerInstructions(
+    parsedTx,
+    createInstruIndex
+  ) as PartiallyDecodedInstruction[];
+
+  let createEventInnerInstruction: PartiallyDecodedInstruction | null = null;
+  for (const createInnerInstruction of createInnerInstructions) {
+    if (
+      createInnerInstruction.programId.toString() ==
+        PUMP_FUN_PROGRAM.toString() &&
+      createInnerInstruction.accounts.length == 1 &&
+      createInnerInstruction.accounts[0].toString() ==
+        "Ce6TQqeHC9p8KetsN6JsjHK7UTZk7nasjjnr7XxXp9F1"
+    ) {
+      createEventInnerInstruction = createInnerInstruction;
+      break;
+    }
+  }
+  if (!createEventInnerInstruction) {
+    return null;
+  }
+
+  const createEventParsedData = struct([
+    u128("id"),
+    str("name"),
+    str("symbol"),
+    str("uri"),
+    publicKey("mint"),
+    publicKey("bondingCurve"),
+    publicKey("user"),
+  ]).decode(bs58.decode(createEventInnerInstruction.data));
+
+  const metadata = await HttpUtil.get(createEventParsedData.uri);
+
+  return {
+    symbol: createEventParsedData.symbol,
+    name: createEventParsedData.name,
+    uri: createEventParsedData.uri,
+    tokenAddress: createEventParsedData.mint.toString(),
+    bondingCurve: createEventParsedData.bondingCurve.toString(),
+    creator: createEventParsedData.user.toString(),
+    metadata: metadata,
   };
 }

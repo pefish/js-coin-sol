@@ -3,11 +3,9 @@ import { StringUtil } from "@pefish/js-node-assist";
 import { publicKey, struct, u128, u64 } from "@raydium-io/raydium-sdk-v2";
 import {
   createCloseAccountInstruction,
-  getAccount,
   getAssociatedTokenAddressSync,
 } from "@solana/spl-token";
 import {
-  Connection,
   ParsedTransactionWithMeta,
   PartiallyDecodedInstruction,
   PublicKey,
@@ -59,7 +57,6 @@ export interface QuoteResponseType {
 
 // pump fun 上面刚出来的币可能获取不到，需要自己构建交易
 export async function getSwapInstructionsFromJup(
-  connection: Connection,
   userAddress: string,
   type: "buy" | "sell",
   tokenAddress: string,
@@ -142,39 +139,16 @@ export async function getSwapInstructionsFromJup(
     deserializeInstruction(cleanupInstruction),
   ];
 
-  if (type == "sell") {
-    if (isCloseTokenAccount) {
-      const tokenAssociatedAccount = getAssociatedTokenAddressSync(
-        tokenAddressPKey,
-        userPKey,
-        false
-      );
-      const tokenAssociatedAccountInfo = await getAccount(
-        connection,
-        tokenAssociatedAccount
-      );
-      const tokenBalance = tokenAssociatedAccountInfo.amount.toString();
-      const tokenAmountWithDecimals = StringUtil.start(amount)
-        .shiftedBy(PUMP_FUN_TOKEN_DECIMALS)
-        .remainDecimal(0)
-        .toString();
-      const afterBal = StringUtil.start(tokenBalance)
-        .sub(tokenAmountWithDecimals)
-        .toNumber();
-      if (afterBal > 0) {
-        throw new Error(
-          `After balance <${afterBal}> not be 0, can not closed.`
-        );
-      }
+  if (type == "sell" && isCloseTokenAccount) {
+    const tokenAssociatedAccount = getAssociatedTokenAddressSync(
+      tokenAddressPKey,
+      userPKey,
+      false
+    );
 
-      instructions.push(
-        createCloseAccountInstruction(
-          tokenAssociatedAccount,
-          userPKey,
-          userPKey
-        )
-      );
-    }
+    instructions.push(
+      createCloseAccountInstruction(tokenAssociatedAccount, userPKey, userPKey)
+    );
   }
 
   return {
@@ -266,8 +240,6 @@ export async function parseJupiterSwapTx(
           jupiterSwapInnerInstruction.accounts[12].toString(),
         serumVaultSignerAddress:
           jupiterSwapInnerInstruction.accounts[13].toString(),
-        coinMintAddress: WSOL_ADDRESS,
-        pcMintAddress: "",
       };
     }
   }
@@ -310,10 +282,6 @@ export async function parseJupiterSwapTx(
     tokenAddress = swapEventParsedData.inputMint.toString();
   }
   const feeInfo = getAllFeeOfTx(transaction);
-
-  if (raydiumSwapKeys) {
-    raydiumSwapKeys.pcMintAddress = tokenAddress;
-  }
 
   return {
     orderInfo: {

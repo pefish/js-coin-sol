@@ -110,8 +110,6 @@ export interface RaydiumSwapKeys {
     serumCoinVaultAccountAddress?: string;
     serumPcVaultAccountAddress?: string;
     serumVaultSignerAddress?: string;
-    coinMintAddress: string;
-    pcMintAddress: string;
 }
 export declare function getRaydiumSwapInstructions(connection: Connection, userAddress: string, type: "buy" | "sell", tokenAddress: string, amount: string, // buy 的话就是 sol 的数量，sell 就是 token 的数量
 slippage: number, raydiumPoolInfo: RaydiumSwapKeys, isCloseTokenAccount?: boolean): Promise<{

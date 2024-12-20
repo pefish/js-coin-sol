@@ -1,4 +1,4 @@
-import { Connection, ParsedTransactionWithMeta, TransactionInstruction } from "@solana/web3.js";
+import { ParsedTransactionWithMeta, TransactionInstruction } from "@solana/web3.js";
 import { Order } from "../constants";
 import { RaydiumSwapKeys } from "../raydium";
 export interface QuoteResponseType {
@@ -27,7 +27,7 @@ export interface QuoteResponseType {
     contextSlot: number;
     timeTaken: number;
 }
-export declare function getSwapInstructionsFromJup(connection: Connection, userAddress: string, type: "buy" | "sell", tokenAddress: string, amount: string, slippage: number, isCloseTokenAccount?: boolean): Promise<{
+export declare function getSwapInstructionsFromJup(userAddress: string, type: "buy" | "sell", tokenAddress: string, amount: string, slippage: number, isCloseTokenAccount?: boolean): Promise<{
     instructions: TransactionInstruction[];
     computeUnits: number;
 }>;

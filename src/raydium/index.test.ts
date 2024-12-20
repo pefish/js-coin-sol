@@ -37,8 +37,6 @@ describe("util", () => {
           "79GMXqFNfHozXTRksF2PkG5v5Fu5HRDQrEb8SQPJCYay",
         serumProgramAddress: "srmqPvymJeFKQ4zGQed1GFppgkRHL9kaELCbyksJtPX",
         serumMarketAddress: "Hu9xY7hThMxiP1iREPYbLdFrWbp25bEihnu9jUpmXGTg",
-        coinMintAddress: "So11111111111111111111111111111111111111112",
-        pcMintAddress: "H3CGsFk57JG6QvWS52nqX8cRXKrn37heo8VY5Z4fpump",
       }
     );
     console.log(result);

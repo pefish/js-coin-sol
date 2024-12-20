@@ -203,8 +203,6 @@ export interface RaydiumSwapKeys {
   serumCoinVaultAccountAddress?: string;
   serumPcVaultAccountAddress?: string;
   serumVaultSignerAddress?: string;
-  coinMintAddress: string;
-  pcMintAddress: string;
 }
 
 export async function getRaydiumSwapInstructions(
@@ -469,23 +467,6 @@ export async function getRaydiumSwapInstructions(
     );
 
     if (isCloseTokenAccount) {
-      if (!tokenAssociatedAccountInfo) {
-        throw new Error(
-          "Order is sell, but tokenAssociatedAccountInfo not found."
-        );
-      }
-      const tokenBalance = (
-        tokenAssociatedAccountInfo.data as ParsedAccountData
-      ).parsed["info"]["tokenAmount"]["amount"];
-      const afterBal = StringUtil.start(tokenBalance)
-        .sub(tokenAmountWithDecimals)
-        .toNumber();
-      if (afterBal > 0) {
-        throw new Error(
-          `After balance <${afterBal}> not be 0, can not closed.`
-        );
-      }
-
       instructions.push(
         createCloseAccountInstruction(
           tokenAssociatedAccount,
@@ -750,8 +731,6 @@ export async function parseRaydiumSwapTx(
       serumCoinVaultAccountAddress: swapInstru.accounts[12].toString(),
       serumPcVaultAccountAddress: swapInstru.accounts[13].toString(),
       serumVaultSignerAddress: swapInstru.accounts[14].toString(),
-      coinMintAddress: WSOL_ADDRESS,
-      pcMintAddress: tokenAddress,
     },
   };
 }

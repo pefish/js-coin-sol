@@ -4,6 +4,7 @@ import "dotenv";
 import {
   getPumpFunSwapInstructions,
   parseBondingCurveAddressData,
+  parsePumpFunCreateTx,
   parsePumpFunRemoveLiqTx,
   parsePumpFunSwapTx,
 } from ".";
@@ -80,6 +81,19 @@ describe("util", () => {
       "5q4r66FuVQYsRH4aNcAPz8Ubc5YpYMwHu4fikBUkXvhC7Pv7JGmWmsRgsCr7yzy379GNfWb7JSqPRjWj1vNa1Kh5"
     );
     const result = await parsePumpFunRemoveLiqTx(conn, tx);
+    console.log(result);
+  });
+
+  it("parsePumpFunCreateTx", async () => {
+    // return;
+    const conn = new Connection("https://api.mainnet-beta.solana.com", {
+      commitment: "confirmed",
+    });
+    const tx = await getParsedTransaction(
+      conn,
+      "5g7TmRxkJUhN6wRV8rNQTrLxLBACztEBx3zyTZnngab3Jk4HmTtUzCh6idUWPwTG816nnj6MQSGbGm7DDZzhU5PX"
+    );
+    const result = await parsePumpFunCreateTx(tx);
     console.log(result);
   });
 });
